@@ -18,9 +18,10 @@ function toggleTheme() {
 }
 // -------------------------------
 
-const API_KEY = "AQ.Ab8RN6JeCWsZF57JgLwRzKY7KreFXMyXYpIsfhgwdwHdLdKDrA"; 
+// 1. YAHAN APNI GEMINI API KEY DAALO (Quotes ke andar)
+const API_KEY = "YOUR_GEMINI_API_KEY_HERE"; 
 
-// 2.FIREBASE CONFIGURATION (scamshield-gaurav)
+// 2. TUMHARI REAL FIREBASE CONFIGURATION (scamshield-gaurav)
 const firebaseConfig = {
   apiKey: "AIzaSyBj1Ak7JD2r1NNtm64AQesObdCZTeqRv2c",
   authDomain: "scamshield-gaurav.firebaseapp.com",
@@ -91,7 +92,50 @@ async function extractQRCode(event) {
   }
 }
 
-// --- REAL-WORLD DATABASE REPORT LOGIC (EXTENDED TIMEOUT TO 12s) ---
+// --- FETCH LIVE RECENT THREATS FROM FIREBASE ---
+async function loadRecentReports() {
+  const feedContainer = document.getElementById("recentThreatsFeed");
+  if (!feedContainer) return;
+
+  try {
+    const snapshot = await db.collection("scam_reports")
+      .orderBy("reported_at", "desc")
+      .limit(3)
+      .get();
+
+    if (snapshot.empty) {
+      feedContainer.innerHTML = `<p class="text-xs text-slate-500 italic">No community threats reported yet. Be the first to report!</p>`;
+      return;
+    }
+
+    let html = "";
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const shortMsg = data.scam_message.length > 55 ? data.scam_message.substring(0, 55) + "..." : data.scam_message;
+      const badgeColor = data.threat_level === "Dangerous" ? "text-rose-500 bg-rose-500/10 border-rose-500/20" : "text-amber-500 bg-amber-500/10 border-amber-500/20";
+      
+      html += `
+        <div class="bg-slate-100 dark:bg-slate-950/60 p-3 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
+          <div class="space-y-0.5 max-w-[70%]">
+            <span class="font-mono text-slate-500 text-[10px]">"${shortMsg}"</span>
+          </div>
+          <span class="px-2 py-0.5 rounded-md font-bold border text-[10px] ${badgeColor}">${data.threat_level} (${data.risk_score}/100)</span>
+        </div>
+      `;
+    });
+    feedContainer.innerHTML = html;
+  } catch (err) {
+    console.error("Error loading live feed: ", err);
+    feedContainer.innerHTML = `<p class="text-xs text-rose-500">Could not load live community feed.</p>`;
+  }
+}
+
+// Load feed on page startup
+window.addEventListener('DOMContentLoaded', () => {
+  loadRecentReports();
+});
+
+// --- REAL-WORLD DATABASE REPORT LOGIC ---
 async function reportToDatabase() {
   const textToReport = document.getElementById("messageInput").value.trim();
   const threatLevel = document.getElementById("threatLevel").innerText;
@@ -116,9 +160,8 @@ async function reportToDatabase() {
   await addTerminalLog("Initiating secure connection to ScamShield-Gaurav Database...");
   await addTerminalLog("Uploading malicious signature hashes...");
 
-  // Extended timeout to 12 seconds for stable cloud sync during live demo
   const timeoutPromise = new Promise((_, reject) => 
-    setTimeout(() => reject(new Error("Database connection timed out. Please check your internet connection or Firebase rules.")), 12000)
+    setTimeout(() => reject(new Error("Database connection timed out. Please check your internet connection.")), 12000)
   );
 
   try {
@@ -134,9 +177,11 @@ async function reportToDatabase() {
 
     await addTerminalLog("SUCCESS: Threat logged to decentralized cloud ledger.");
     
+    // Refresh community feed after successful report
+    loadRecentReports();
+
     setTimeout(() => {
       terminalBox.classList.add("hidden");
-      resultsCard.classList.add("hidden"); // keep results hidden or shown as preferred, let's keep results visible
       resultsCard.classList.remove("hidden");
       btn.innerHTML = "✅ Reported to Global Database (Live)";
       btn.classList.replace("bg-rose-600", "bg-emerald-600");
@@ -156,7 +201,7 @@ async function reportToDatabase() {
   }
 }
 
-// --- DYNAMIC GAMIFIED QUIZ LOGIC (ALL ENGLISH) ---
+// --- DYNAMIC GAMIFIED QUIZ LOGIC ---
 const quizQuestions = [
   {
     text: "Dear User, your HDFC bank account is suspended due to KYC pending. Click here to update PAN immediately: http://hdfc-kyc-update.info",
@@ -172,21 +217,6 @@ const quizQuestions = [
     text: "Congratulations! Your mobile number has won Rs. 50,00,000 in KBC Jio Lucky Draw. Send WhatsApp message to +92XXXXXX to claim.",
     type: "fake",
     explanation: "Classic lottery scam! Official organizations never host random draws for mobile numbers, and international prefixes like +92 are red flags."
-  },
-  {
-    text: "Netflix: Your subscription has expired. Update your payment details immediately at https://netflix-billing-update.com/login to avoid suspension.",
-    type: "fake",
-    explanation: "Phishing alert! The domain name is unofficial ('netflix-billing-update.com') designed to steal credit card data."
-  },
-  {
-    text: "Dear Customer, Rs 4,500.00 has been debited from A/c XX3412 on 04-Sep-26. Info: UPI-Zomato. Avl Bal Rs 12,450.00. - SBI",
-    type: "real",
-    explanation: "Standard bank alert notification. It only provides transactional details and requests no action."
-  },
-  {
-    text: "URGENT: Your electricity power will be disconnected tonight at 9:30 PM from the main office. Call executive officer on 9876543210 immediately.",
-    type: "fake",
-    explanation: "Utility providers never issue night-time disconnection threats via SMS or direct personal mobile numbers."
   }
 ];
 
@@ -223,7 +253,7 @@ function checkQuiz(userAnswer) {
   }
 }
 
-// WhatsApp Share (English)
+// WhatsApp Share
 function shareOnWhatsApp() {
   const msg = `🚨 *Scam Alert!* 🚨\n\nScamShield AI flagged this message with a risk score of ${currentScore}/100.\n\n*Expert Advice:*${currentSummary}\n\nStay safe and vigilant!`;
   const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
@@ -235,7 +265,7 @@ function findLinks(text) {
   return text.match(urlRegex) || [];
 }
 
-// Core Analysis Logic (English Output Prompt & UI)
+// Core Analysis Logic
 async function analyzeMessage() {
   const text = document.getElementById("messageInput").value.trim();
   const btn = document.getElementById("scanBtn");
