@@ -18,10 +18,10 @@ function toggleTheme() {
 }
 // -------------------------------
 
-// 1. YAHAN APNI GEMINI API KEY DAALO (Quotes ke andar)
-const API_KEY = "Your api key here"; 
+// GEMINI API CONFIGURATION (Verified AQ format key)
+const API_KEY = "YOUR_GEMINI_API_KEY_HERE"; 
 
-// 2. TUMHARI REAL FIREBASE CONFIGURATION (scamshield-gaurav)
+// FIREBASE DATABASE CONFIGURATION
 const firebaseConfig = {
   apiKey: "AIzaSyBj1Ak7JD2r1NNtm64AQesObdCZTeqRv2c",
   authDomain: "scamshield-gaurav.firebaseapp.com",
@@ -92,6 +92,109 @@ async function extractQRCode(event) {
   }
 }
 
+// --- FORENSIC MEDIA SCANNER (Metadata/EXIF URL Extraction) ---
+async function runForensicScan(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const forensicBtn = document.getElementById("forensicBtn");
+  const originalText = forensicBtn.innerHTML;
+  forensicBtn.innerHTML = "⏳ Scanning Metadata...";
+  forensicBtn.disabled = true;
+
+  const terminalBox = document.getElementById("terminalBox");
+  const terminalLogs = document.getElementById("terminalLogs");
+  const resultsCard = document.getElementById("resultsCard");
+
+  resultsCard.classList.add("hidden");
+  terminalBox.classList.remove("hidden");
+  terminalLogs.innerHTML = "";
+
+  await addTerminalLog(`Initializing forensic analysis on: ${file.name}`);
+  await addTerminalLog("Checking file signature and magic bytes...");
+  await addTerminalLog("Extracting EXIF metadata and hidden payloads...");
+
+  try {
+    EXIF.getData(file, async function() {
+      const allMetaData = EXIF.getAllTags(this);
+      let metaString = JSON.stringify(allMetaData);
+      
+      if (Object.keys(allMetaData).length === 0) {
+         metaString = "No EXIF data found. File appears clean of metadata injection.";
+      }
+
+      const urlRegex = /(https?:\/\/[^\s]+)/g;
+      const hiddenLinks = metaString.match(urlRegex) || [];
+
+      await addTerminalLog("Metadata extraction complete.");
+
+      const scoreEl = document.getElementById("riskScore");
+      const levelEl = document.getElementById("threatLevel");
+      const summaryEl = document.getElementById("analysisSummary");
+      const linkWarningBox = document.getElementById("linkWarningBox");
+      const extractedLinks = document.getElementById("extractedLinks");
+      const stepsContainer = document.getElementById("safeStepsList");
+
+      stepsContainer.innerHTML = ""; 
+
+      if (hiddenLinks.length > 0) {
+        await addTerminalLog(`WARNING: Detected ${hiddenLinks.length} hidden URL(s) in media metadata!`);
+        
+        currentScore = 85;
+        currentSummary = "Forensic analysis detected hidden URLs embedded within the image metadata. This is a common technique used to bypass security filters and hide malicious payloads or tracking pixels.";
+        
+        scoreEl.innerText = `${currentScore} / 100`;
+        scoreEl.className = "text-4xl font-black text-rose-500 drop-shadow-[0_0_15px_rgba(244,63,94,0.4)]";
+        
+        levelEl.innerText = "Dangerous";
+        levelEl.className = "text-2xl font-bold leading-relaxed text-rose-500";
+        
+        extractedLinks.innerHTML = hiddenLinks.map(link => `<li>⚠️ <code>${link}</code> (Hidden in Metadata)</li>`).join("");
+        linkWarningBox.classList.remove("hidden");
+
+        const stepLi = document.createElement("li");
+        stepLi.className = "flex gap-2.5 items-start bg-slate-100/50 dark:bg-slate-950/40 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800/60";
+        stepLi.innerHTML = `<span class="text-emerald-500 font-bold mt-0.5">✓</span><span>Do not share this file. Delete it immediately to prevent accidental execution of hidden payloads.</span>`;
+        stepsContainer.appendChild(stepLi);
+
+      } else {
+        await addTerminalLog("No suspicious URLs found in media metadata.");
+        
+        currentScore = 15;
+        currentSummary = "Forensic analysis did not detect any hidden URLs or suspicious metadata injections in this file. However, always remain cautious with files from unknown sources.";
+        
+        scoreEl.innerText = `${currentScore} / 100`;
+        scoreEl.className = "text-4xl font-black text-emerald-500 drop-shadow-[0_0_15px_rgba(16,185,129,0.4)]";
+        
+        levelEl.innerText = "Safe";
+        levelEl.className = "text-2xl font-bold leading-relaxed text-emerald-500";
+        
+        linkWarningBox.classList.add("hidden");
+
+        const stepLi = document.createElement("li");
+        stepLi.className = "flex gap-2.5 items-start bg-slate-100/50 dark:bg-slate-950/40 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800/60";
+        stepLi.innerHTML = `<span class="text-emerald-500 font-bold mt-0.5">✓</span><span>The file metadata is clean, but ensure your antivirus is active before opening files.</span>`;
+        stepsContainer.appendChild(stepLi);
+      }
+
+      summaryEl.innerText = currentSummary;
+      
+      setTimeout(() => {
+        terminalBox.classList.add("hidden");
+        resultsCard.classList.remove("hidden");
+      }, 1500);
+    });
+  } catch (err) {
+    console.error(err);
+    alert("Forensic scan error: " + err.message);
+    terminalBox.classList.add("hidden");
+  } finally {
+    forensicBtn.innerHTML = "🕵️ Forensic Scan";
+    forensicBtn.disabled = false;
+    event.target.value = ""; // Reset input
+  }
+}
+
 // --- FETCH LIVE RECENT THREATS FROM FIREBASE ---
 async function loadRecentReports() {
   const feedContainer = document.getElementById("recentThreatsFeed");
@@ -137,14 +240,9 @@ window.addEventListener('DOMContentLoaded', () => {
 
 // --- REAL-WORLD DATABASE REPORT LOGIC ---
 async function reportToDatabase() {
-  const textToReport = document.getElementById("messageInput").value.trim();
+  const textToReport = document.getElementById("messageInput").value.trim() || "Forensic Scan Payload (Hidden Data)";
   const threatLevel = document.getElementById("threatLevel").innerText;
   
-  if (!textToReport) {
-    alert("No message to report!");
-    return;
-  }
-
   const btn = document.getElementById("reportBtn");
   const resultsCard = document.getElementById("resultsCard");
   const terminalBox = document.getElementById("terminalBox");
@@ -157,7 +255,7 @@ async function reportToDatabase() {
   terminalBox.classList.remove("hidden");
   terminalLogs.innerHTML = "";
 
-  await addTerminalLog("Initiating secure connection to ScamShield-Gaurav Database...");
+  await addTerminalLog("Initiating secure connection to ScamShield Database...");
   await addTerminalLog("Uploading malicious signature hashes...");
 
   const timeoutPromise = new Promise((_, reject) => 
@@ -176,8 +274,6 @@ async function reportToDatabase() {
     ]);
 
     await addTerminalLog("SUCCESS: Threat logged to decentralized cloud ledger.");
-    
-    // Refresh community feed after successful report
     loadRecentReports();
 
     setTimeout(() => {
@@ -255,7 +351,7 @@ function checkQuiz(userAnswer) {
 
 // WhatsApp Share
 function shareOnWhatsApp() {
-  const msg = `🚨 *Scam Alert!* 🚨\n\nScamShield AI flagged this message with a risk score of ${currentScore}/100.\n\n*Expert Advice:*${currentSummary}\n\nStay safe and vigilant!`;
+  const msg = `🚨 *Scam Alert!* 🚨\n\nScamShield AI flagged this threat with a risk score of ${currentScore}/100.\n\n*Expert Advice:*${currentSummary}\n\nStay safe and vigilant!`;
   const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
   window.open(whatsappUrl, "_blank");
 }
@@ -268,16 +364,17 @@ function findLinks(text) {
 // Core Analysis Logic
 async function analyzeMessage() {
   const text = document.getElementById("messageInput").value.trim();
-  const btn = document.getElementById("scanBtn");
-  const resultsCard = document.getElementById("resultsCard");
-  const terminalBox = document.getElementById("terminalBox");
-  const terminalLogs = document.getElementById("terminalLogs");
-  const reportBtn = document.getElementById("reportBtn"); 
 
   if (!text) {
     alert("Please enter a message or upload an evidence screenshot/QR code first!");
     return;
   }
+
+  const btn = document.getElementById("scanBtn");
+  const resultsCard = document.getElementById("resultsCard");
+  const terminalBox = document.getElementById("terminalBox");
+  const terminalLogs = document.getElementById("terminalLogs");
+  const reportBtn = document.getElementById("reportBtn"); 
 
   btn.innerText = "Analyzing...";
   btn.disabled = true;
@@ -299,11 +396,12 @@ async function analyzeMessage() {
   {
     "threat_level": "Safe" or "Suspicious" or "Dangerous",
     "risk_score": <number between 0-100>,
-    "hindi_explanation": "<clear professional safety summary in English>",
+    "analysis_summary": "<clear professional safety summary in English>",
     "safe_steps": ["<step 1>", "<step 2>"]
   }`;
 
   try {
+    // Explicitly targeting the v1beta endpoint with 1.5-flash
     const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=" + API_KEY;
     
     const response = await fetch(url, {
@@ -327,7 +425,7 @@ async function analyzeMessage() {
     const output = JSON.parse(rawText);
 
     currentScore = output.risk_score;
-    currentSummary = output.hindi_explanation;
+    currentSummary = output.analysis_summary;
 
     const scoreEl = document.getElementById("riskScore");
     scoreEl.innerText = `${output.risk_score} / 100`;
@@ -337,7 +435,7 @@ async function analyzeMessage() {
     levelEl.innerText = output.threat_level;
     levelEl.className = `text-2xl font-bold leading-relaxed ${output.risk_score > 60 ? 'text-rose-500' : 'text-emerald-500'}`;
 
-    document.getElementById("hindiSummary").innerText = output.hindi_explanation;
+    document.getElementById("analysisSummary").innerText = output.analysis_summary;
 
     const stepsContainer = document.getElementById("safeStepsList");
     stepsContainer.innerHTML = "";

@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ScamShield AI - Ignition Edition</title>
+  <title>ScamShield AI</title>
   
-  <!-- External Libraries -->
+  <link rel="icon" type="image/png" href="logo.png">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
   
-  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   
@@ -23,17 +24,14 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen selection:bg-blue-500 selection:text-white relative overflow-x-hidden flex flex-col items-center py-10 px-4 transition-colors duration-500">
 
-  <!-- TOP LEFT: Chrome Extension Button -->
-  <button onclick="alert('ScamShield Extension is currently in Beta testing for the Ignition Hackathon. Stay tuned for the web-store launch!')" class="fixed top-5 left-6 z-50 p-2 px-4 rounded-full bg-indigo-600/10 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-400 border border-indigo-300 dark:border-indigo-500/30 shadow-lg hover:scale-105 transition-transform text-xs font-bold flex items-center gap-2 backdrop-blur-md">
+  <button onclick="alert('ScamShield Extension is currently in Beta testing. Stay tuned for the web-store launch!')" class="fixed top-5 left-6 z-50 p-2 px-4 rounded-full bg-indigo-600/10 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-400 border border-indigo-300 dark:border-indigo-500/30 shadow-lg hover:scale-105 transition-transform text-xs font-bold flex items-center gap-2 backdrop-blur-md">
     🧩 Add to Chrome (Beta)
   </button>
 
-  <!-- TOP RIGHT: Theme Toggle -->
   <button onclick="toggleTheme()" class="fixed top-5 right-6 z-50 p-2.5 rounded-full bg-white/60 dark:bg-slate-800/60 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-lg hover:scale-110 transition-transform text-lg" title="Toggle Light/Dark Mode">
     🌓
   </button>
 
-  <!-- LEFT SIDE 3D TILT CARDS -->
   <div class="hidden lg:flex flex-col gap-4 fixed left-6 top-28 w-56 z-0">
     <div class="tilt-card float-1 bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-rose-500/20 dark:border-rose-500/30 p-3 rounded-2xl shadow-xl space-y-1">
       <div class="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 font-bold text-xs uppercase tracking-wider"><span>🚨</span> Digital Arrest</div>
@@ -49,7 +47,6 @@
     </div>
   </div>
 
-  <!-- RIGHT SIDE 3D TILT CARDS -->
   <div class="hidden lg:flex flex-col gap-4 fixed right-6 top-28 w-56 z-0">
     <div class="tilt-card float-4 bg-white/40 dark:bg-slate-900/40 backdrop-blur-xl border border-amber-500/20 dark:border-amber-500/30 p-3 rounded-2xl shadow-xl space-y-1">
       <div class="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-bold text-xs uppercase tracking-wider"><span>💸</span> UPI Collect Trap</div>
@@ -65,15 +62,12 @@
     </div>
   </div>
 
-  <!-- Background Graphics -->
   <div class="cyber-grid"></div>
   <div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-blue-600/10 dark:bg-blue-600/20 rounded-full blur-[120px] pointer-events-none z-0"></div>
   <div class="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-indigo-600/10 dark:bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none z-0"></div>
 
-  <!-- Main Block -->
   <div class="w-full max-w-2xl mx-auto space-y-6 z-10 relative mt-10">
     
-    <!-- Header -->
     <div class="text-center space-y-3">
       <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 dark:bg-slate-900/80 border border-blue-300 dark:border-blue-500/30 text-blue-600 dark:text-blue-400 text-xs font-bold uppercase tracking-widest mb-2 shadow-sm dark:shadow-[0_0_15px_rgba(59,130,246,0.15)]">
         <span class="relative flex h-2 w-2">
@@ -83,50 +77,43 @@
         AI-Powered Cyber Defense
       </div>
       <h1 class="text-5xl font-extrabold tracking-tight flex items-center justify-center gap-3">
-        🛡️ <span class="animate-gradient-text drop-shadow-md dark:drop-shadow-lg">ScamShield AI</span>
+        <img src="logo.png" alt="Logo" class="w-12 h-12 object-contain drop-shadow-md" onerror="this.style.display='none'">
+        <span class="animate-gradient-text drop-shadow-md dark:drop-shadow-lg">ScamShield AI</span>
       </h1>
       <p class="text-sm text-slate-600 dark:text-slate-400 font-medium">
         Advanced Fraud SMS, QR Code & Threat Intelligence Matrix
       </p>
     </div>
 
-    <!-- Input Card with Glowing Cyber Border -->
     <div class="hover-lift bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border-2 border-blue-500/40 dark:border-blue-500/50 rounded-2xl p-7 space-y-4 shadow-xl dark:shadow-[0_0_25px_rgba(59,130,246,0.15)] transition-colors duration-500">
       
-      <!-- API Key Config Box (GitHub/Demo Safe) -->
-      <div class="mb-2 p-3 bg-slate-100/80 dark:bg-slate-950/60 rounded-xl border border-slate-200 dark:border-slate-800 text-xs flex flex-col sm:flex-row items-center justify-between gap-2">
-        <span class="text-slate-500 font-medium">🔑 Gemini API Config (Demo Mode):</span>
-        <div class="flex items-center gap-2 w-full sm:w-auto">
-          <input type="password" id="customApiKey" placeholder="Paste API Key here..." class="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 rounded-lg text-xs text-slate-800 dark:text-slate-200 w-full sm:w-44 focus:outline-none focus:ring-1 focus:ring-blue-500">
-          <button onclick="saveCustomKey()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-all shadow-md">Save</button>
-        </div>
-      </div>
-
       <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300">
         Paste suspicious text, or upload evidence:
       </label>
       <textarea id="messageInput" rows="4" placeholder="e.g. Dear customer, your electricity power will be disconnected..." class="w-full bg-slate-50/50 dark:bg-slate-950/80 border border-slate-300 dark:border-slate-700/80 rounded-xl p-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 shadow-inner"></textarea>
       
-      <!-- Primary Action -->
       <button id="scanBtn" onclick="analyzeMessage()" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 rounded-xl font-bold text-sm text-white transition-all shadow-lg shadow-blue-500/30 hover:shadow-blue-500/50 flex items-center justify-center gap-2 transform hover:-translate-y-0.5">
         🔍 Run Security Scan
       </button>
       
-      <!-- Secondary Actions (Upload Image & QR) -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-2">
         <input type="file" id="imageInput" accept="image/*" class="hidden" onchange="extractTextFromImage(event)">
         <button id="uploadBtn" onclick="document.getElementById('imageInput').click()" class="py-3 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 text-slate-700 dark:text-slate-200 transform hover:-translate-y-0.5">
-          📸 Read Screenshot
+          📸 Read Image
         </button>
 
         <input type="file" id="qrInput" accept="image/*" class="hidden" onchange="extractQRCode(event)">
         <button id="qrBtn" onclick="document.getElementById('qrInput').click()" class="py-3 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 text-slate-700 dark:text-slate-200 transform hover:-translate-y-0.5">
-          🔳 Scan QR Code
+          🔳 Scan QR
+        </button>
+
+        <input type="file" id="forensicInput" accept="image/*,video/*" class="hidden" onchange="runForensicScan(event)">
+        <button id="forensicBtn" onclick="document.getElementById('forensicInput').click()" class="py-3 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-xl font-semibold text-sm transition-all flex items-center justify-center gap-2 text-slate-700 dark:text-slate-200 transform hover:-translate-y-0.5">
+          🕵️ Forensic Scan
         </button>
       </div>
     </div>
 
-    <!-- Live Terminal Box -->
     <div id="terminalBox" class="hidden bg-[#0a0a0a] border border-slate-700/80 rounded-xl p-5 font-mono text-xs text-emerald-400 space-y-1.5 shadow-[inset_0_0_20px_rgba(0,0,0,0.8)] relative overflow-hidden">
       <div class="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_4px,3px_100%] pointer-events-none opacity-20"></div>
       <div class="text-slate-500 pb-2 border-b border-slate-800 flex justify-between items-center relative z-10">
@@ -136,7 +123,6 @@
       <div id="terminalLogs" class="space-y-1.5 pt-2 relative z-10 text-[13px]"></div>
     </div>
 
-    <!-- Results Section -->
     <div id="resultsCard" class="hidden hover-lift bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border border-slate-200 dark:border-slate-700/50 rounded-2xl p-7 space-y-6 shadow-xl dark:shadow-2xl transition-colors duration-500">
       
       <div class="grid grid-cols-2 gap-5 pb-6 border-b border-slate-200 dark:border-slate-700/50">
@@ -159,7 +145,7 @@
 
       <div>
         <h3 class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest mb-2">AI Threat Analysis & Summary:</h3>
-        <p id="hindiSummary" class="text-amber-900 dark:text-amber-100 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 p-4 rounded-xl text-[15px] leading-relaxed shadow-inner"></p>
+        <p id="analysisSummary" class="text-amber-900 dark:text-amber-100 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/30 p-4 rounded-xl text-[15px] leading-relaxed shadow-inner"></p>
       </div>
 
       <div>
@@ -171,14 +157,12 @@
         <button onclick="shareOnWhatsApp()" class="w-full py-4 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5">
           💬 Share Alert on WhatsApp
         </button>
-        <!-- GLOBAL REPORT BUTTON -->
         <button id="reportBtn" onclick="reportToDatabase()" class="w-full py-3.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-rose-500/30 hover:-translate-y-0.5 border border-rose-700">
           🚨 Report to Global Threat Database
         </button>
       </div>
     </div>
 
-    <!-- LIVE COMMUNITY THREAT FEED CARD -->
     <div class="hover-lift bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border border-slate-200 dark:border-slate-700/50 rounded-2xl p-7 space-y-4 shadow-xl dark:shadow-2xl transition-colors duration-500">
       <div class="flex items-center justify-between">
         <h2 class="text-lg font-extrabold text-slate-800 dark:text-white flex items-center gap-2">🌐 Live Community Threat Feed</h2>
@@ -189,13 +173,11 @@
       </div>
       <p class="text-xs text-slate-500 dark:text-slate-400">Real-time crowdsourced scam reports logged by users worldwide:</p>
       
-      <!-- Feed Container -->
       <div id="recentThreatsFeed" class="space-y-2">
         <p class="text-xs text-slate-400 italic">Syncing with Firebase cloud ledger...</p>
       </div>
     </div>
 
-    <!-- Gamified Quiz Card -->
     <div class="hover-lift bg-white/70 dark:bg-slate-900/70 backdrop-blur-2xl border border-slate-200 dark:border-slate-700/50 rounded-2xl p-7 shadow-xl dark:shadow-2xl transition-colors duration-500">
       <div class="flex items-center justify-between mb-5">
         <h2 class="text-lg font-extrabold text-slate-800 dark:text-white flex items-center gap-2">🎮 Test Your Scam IQ</h2>
@@ -222,12 +204,10 @@
 
   </div>
 
-  <!-- Footer Credit -->
   <footer class="w-full text-center py-6 text-xs text-slate-500 dark:text-slate-400 font-medium z-10 relative mt-6">
     Made with ❤️ by team Shield
   </footer>
 
-  <!-- 3D Tilt JavaScript Effect -->
   <script>
     const cards = document.querySelectorAll('.tilt-card');
     cards.forEach(card => {

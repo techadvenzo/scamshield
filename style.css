@@ -1,113 +1,83 @@
-/* style.css */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-::-webkit-scrollbar-track {
-  background: #020617; 
-}
-::-webkit-scrollbar-thumb {
-  background: #1e293b; 
-  border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #3b82f6; 
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
-/* Background Animated Grid - FIXED WIDTH ISSUE */
+/* Cyber Grid Background Pattern */
 .cyber-grid {
   position: fixed;
-  inset: 0; /* Yeh top, left, 100vw, 100vh ki jagah perfect fitting deta hai */
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
   background-image: 
-    linear-gradient(to right, rgba(59, 130, 246, 0.05) 1px, transparent 1px),
+    linear-gradient(to right, rgba(102, 150, 226, 0.05) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(59, 130, 246, 0.05) 1px, transparent 1px);
-  background-size: 40px 40px;
-  z-index: -1;
+  background-size: 32px 32px;
+  z-index: 0;
   pointer-events: none;
 }
 
-/* Gradient Text Animation */
+.dark .cyber-grid {
+  background-image: 
+    linear-gradient(to right, rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+}
+
+/* Gradient Text Effect */
 .animate-gradient-text {
-  background: linear-gradient(to right, #3b82f6, #8b5cf6, #3b82f6);
-  background-size: 200% auto;
-  color: transparent;
+  background: linear-gradient(135deg, #da6cf0 0%, #da7fe6 50%, #8b5cf6 100%);
   -webkit-background-clip: text;
-  background-clip: text;
-  animation: shine 3s linear infinite;
+  -webkit-text-fill-color: transparent;
 }
 
-@keyframes shine {
-  to {
-    background-position: 200% center;
-  }
-}
-
-/* Glowing Pulse for Terminal */
-@keyframes pulse-slow {
-  0%, 100% { opacity: 1; box-shadow: 0 0 5px rgba(16, 185, 129, 0.2); }
-  50% { opacity: 0.4; box-shadow: 0 0 15px rgba(16, 185, 129, 0.6); }
-}
-
-.animate-pulse-slow {
-  animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Smooth Card Lift on Hover */
+/* Hover Lift Effect for Cards */
 .hover-lift {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
+
 .hover-lift:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px -15px rgba(59, 130, 246, 0.2);
-}
-/* Floating Animation for Knowledge Cards */
-@keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-10px) rotate(1deg); }
+  transform: translateY(-3px);
 }
 
-.floating-card-1 {
-  animation: float 6s ease-in-out infinite;
-}
-
-.floating-card-2 {
-  animation: float 8s ease-in-out infinite 1s;
-}
-/* Multi-Card Floating Animations */
+/* Floating Animations for 3D Cards */
 @keyframes float1 {
   0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-12px) rotate(1deg); }
+  50% { transform: translateY(-8px) rotate(0.5deg); }
 }
 @keyframes float2 {
   0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(12px) rotate(-1deg); }
+  50% { transform: translateY(-10px) rotate(-0.5deg); }
+}
+@keyframes float3 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(0.8deg); }
 }
 
-.floating-card-left-1 { animation: float1 7s ease-in-out infinite; }
-.floating-card-left-2 { animation: float2 9s ease-in-out infinite 1s; }
-.floating-card-right-1 { animation: float2 8s ease-in-out infinite 0.5s; }
-.floating-card-right-2 { animation: float1 10s ease-in-out infinite 1.5s; }
-/* 3D Tilt Card Style */
+.float-1 { animation: float1 6s ease-in-out infinite; }
+.float-2 { animation: float2 7s ease-in-out infinite; }
+.float-3 { animation: float3 5s ease-in-out infinite; }
+.float-4 { animation: float4 6.5s ease-in-out infinite; }
+.float-5 { animation: float5 7.5s ease-in-out infinite; }
+.float-6 { animation: float6 5.5s ease-in-out infinite; }
+
+@keyframes float4 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-9px) rotate(-0.6deg); }
+}
+@keyframes float5 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-7px) rotate(0.5deg); }
+}
+@keyframes float6 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-11px) rotate(-0.4deg); }
+}
+
+/* Tilt Card Perspectives */
 .tilt-card {
-  transition: transform 0.1s ease, box-shadow 0.3s ease;
+  transition: transform 0.1s ease-out;
   transform-style: preserve-3d;
-  perspective: 1000px;
+  will-change: transform;
 }
-
-/* Floating Animations */
-@keyframes floatA {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-10px) rotate(0.5deg); }
-}
-@keyframes floatB {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(10px) rotate(-0.5deg); }
-}
-
-.float-1 { animation: floatA 6s ease-in-out infinite; }
-.float-2 { animation: floatB 8s ease-in-out infinite 1s; }
-.float-3 { animation: floatA 7s ease-in-out infinite 0.5s; }
-.float-4 { animation: floatB 9s ease-in-out infinite 1.5s; }
-.float-5 { animation: floatA 8s ease-in-out infinite 2s; }
-.float-6 { animation: floatB 7s ease-in-out infinite 0.8s; }
