@@ -19,7 +19,7 @@ function toggleTheme() {
 // -------------------------------
 
 // 1. YAHAN APNI GEMINI API KEY DAALO (Quotes ke andar)
-const API_KEY = "YOUR_GEMINI_API_KEY_HERE"; 
+const API_KEY = "AQ.Ab8RN6IcRAUo-Q47hpqvega8t1WcjDDaKgiMb4UAgy5W1P1sNg"; 
 
 // 2. TUMHARI REAL FIREBASE CONFIGURATION (scamshield-gaurav)
 const firebaseConfig = {
